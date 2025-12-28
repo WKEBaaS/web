@@ -1,3 +1,4 @@
+import { env } from '$env/dynamic/private';
 import { authClient } from '$lib/auth-client';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import type { Handle } from '@sveltejs/kit';
@@ -25,4 +26,15 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-export const handle: Handle = sequence(handleParaglide, handleAuth);
+const handleFetch: Handle = async ({ event, resolve }) => {
+	if (event.request.url.includes(env.BAAS_API_URL)) {
+		// 將原始請求的所有 Cookie 轉發給內部的 API
+		const cookie = event.request.headers.get('cookie');
+		if (cookie) {
+			event.request.headers.set('cookie', cookie);
+		}
+	}
+	return resolve(event);
+};
+
+export const handle: Handle = sequence(handleParaglide, handleAuth, handleFetch);
