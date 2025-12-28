@@ -41,10 +41,9 @@
 			</Drawer.Title>
 			<Drawer.Description>{m.update_email_settings_description()}</Drawer.Description>
 			<div class="mt-8 space-y-4">
-				<Field.Field>
+				<Field.Field orientation="horizontal" class="flex items-center">
 					<Field.Label>{m.enable_email_provider()}</Field.Label>
 					<Switch bind:checked={enabled} />
-					/>
 				</Field.Field>
 			</div>
 		</Drawer.Header>
