@@ -4,15 +4,14 @@ import { error } from '@sveltejs/kit';
 import * as v from 'valibot';
 
 export const GET = async (event) => {
-	const ref = event.url.searchParams.get('ref');
 	const pcid = event.url.searchParams.get('pcid');
 
-	if (!ref || !pcid) {
-		return new Response('Missing parameters', { status: 400 });
+	if (!pcid) {
+		return new Response('missing pcid in query', { status: 400 });
 	}
 
 	const url = new URL('/v1/project/class-children', env.BAAS_API_URL);
-	url.searchParams.append('ref', ref);
+	url.searchParams.append('ref', event.params.ref);
 	url.searchParams.append('pcid', pcid);
 
 	const resp = await event.fetch(url);

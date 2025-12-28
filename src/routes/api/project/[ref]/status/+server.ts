@@ -3,15 +3,9 @@ import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async (event) => {
-	const ref = event.url.searchParams.get('ref');
-
-	if (!ref) {
-		throw error(400, 'Missing reference parameter');
-	}
-
 	// 1. 建構外部 BAAS 的 URL
 	const targetUrl = new URL('/v1/project/status', env.BAAS_API_URL);
-	targetUrl.searchParams.set('ref', ref);
+	targetUrl.searchParams.set('ref', event.params.ref);
 
 	try {
 		// 2. 呼叫外部 API

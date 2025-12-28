@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import type { ClassMetadata } from '$lib/schemas/index.js';
 	import type { OnChangeFn } from '$lib/types';
 	import { cn } from '$lib/utils';
@@ -28,9 +29,11 @@
 	let fetched = $state(false);
 
 	$effect(() => {
-		if (!fetched && ref && open && children.length === 0) {
-			const uri = `/api/get-users-class-children?ref=${ref}&pcid=${nodeClass.id}`;
-			fetch(uri)
+		if (!fetched && open && children.length === 0) {
+			let uri = resolve(`/api/project/[ref]/class-children`, {
+				ref: ref
+			});
+			fetch(uri + `?pcid=${nodeClass.id}`)
 				.then((resp) => (resp.ok ? resp : Promise.reject(new Error('Failed to fetch class children'))))
 				.then((resp) => resp.json())
 				.then((data) => {

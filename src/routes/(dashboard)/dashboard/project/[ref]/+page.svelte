@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { env } from '$env/dynamic/public';
 	import * as Alert from '$lib/components/ui/alert/index.js';
@@ -37,7 +38,7 @@
 		if (!isNew) {
 			return;
 		}
-		const eventSource = new EventSource(`/api/project/status?ref=${project.reference}`);
+		const eventSource = new EventSource(resolve(`/api/project/[ref]/status`, { ref: data.project.reference }));
 		eventSource.addEventListener('project-status', async (event) => {
 			try {
 				const jsonData = JSON.parse(event.data);
