@@ -27,6 +27,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 };
 
 const handleFetch: Handle = async ({ event, resolve }) => {
+	console.log('Fetch URL:', event.request.url);
 	if (event.request.url.includes(env.BAAS_API_URL)) {
 		// 將原始請求的所有 Cookie 轉發給內部的 API
 		const cookie = event.request.headers.get('cookie');
