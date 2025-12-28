@@ -1,20 +1,24 @@
 <script lang="ts">
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
-	import * as Form from '$lib/components/ui/form/index.js';
+	import * as Field from '$lib/components/ui/field/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as m from '$lib/paraglide/messages';
+	import { updateProxyURL } from '$lib/remotes';
 	import LoaderCircleIcon from '@lucide/svelte/icons/loader-circle';
-	import type { SuperForm } from 'sveltekit-superforms';
-	import type { UpdateProxyURL } from '../schema';
+	import { toast } from 'svelte-sonner';
 
 	interface ProxyURLDialogProps {
-		form: SuperForm<UpdateProxyURL>;
 		open?: boolean;
+		projectId: string;
+		proxyURL?: string;
 	}
 
-	let { form, open = $bindable(false) }: ProxyURLDialogProps = $props();
-	let { form: formData, enhance, delayed } = form;
+	let { open = $bindable(false), projectId, proxyURL }: ProxyURLDialogProps = $props();
+
+	$effect(() => {
+		updateProxyURL.fields.proxyURL.set(proxyURL ?? '');
+	});
 </script>
 
 <div class="bg-card flex items-end justify-between rounded-lg border p-4">
@@ -28,8 +32,18 @@
 	<AlertDialog.Root bind:open>
 		<AlertDialog.Trigger class={buttonVariants({ variant: 'default' })}>{m.update_proxy_url()}</AlertDialog.Trigger>
 		<AlertDialog.Content>
-			<form method="POST" action="?/updateProxyURL" use:enhance>
-				<input type="hidden" name="id" value={$formData.id} />
+			<form
+				{...updateProxyURL.enhance(async ({ submit }) => {
+					await submit();
+					if (updateProxyURL.result?.success) {
+						toast.success(m.proxy_url_updated());
+						open = false;
+					} else {
+						toast.error(m.update_proxy_url() + ` failed: ${updateProxyURL.result?.message}`);
+					}
+				})}
+			>
+				<input {...updateProxyURL.fields.id.as('hidden', projectId)} />
 				<AlertDialog.Header>
 					<AlertDialog.Title>{m.are_you_sure()}</AlertDialog.Title>
 					<AlertDialog.Description>
@@ -38,20 +52,18 @@
 
 					<!-- update project setting form fields -->
 					<div class="my-3 space-y-4">
-						<Form.Field {form} name="proxyURL">
-							<Form.Control>
-								{#snippet children({ props })}
-									<Form.Label>{m.proxy_url()}</Form.Label>
-									<Input type="text" {...props} placeholder="" bind:value={$formData.proxyURL} />
-								{/snippet}
-							</Form.Control>
-							<Form.FieldErrors />
-						</Form.Field>
+						<Field.Field>
+							<Field.Label for="proxy-url">{m.proxy_url()}</Field.Label>
+							<Input id="proxy-url" {...updateProxyURL.fields.proxyURL.as('text')} />
+							{#each updateProxyURL.fields.proxyURL.issues() ?? [] as issue (issue)}
+								<Field.FieldError>{issue.message}</Field.FieldError>
+							{/each}
+						</Field.Field>
 					</div>
 				</AlertDialog.Header>
 				<AlertDialog.Footer>
 					<AlertDialog.Cancel type="button">{m.cancel()}</AlertDialog.Cancel>
-					{#if $delayed}<LoaderCircleIcon class="animate-spin" />{/if}
+					{#if updateProxyURL.pending}<LoaderCircleIcon class="animate-spin" />{/if}
 					<AlertDialog.Action type="submit">{m.confirm()}</AlertDialog.Action>
 				</AlertDialog.Footer>
 			</form>

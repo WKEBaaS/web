@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { env } from '$env/dynamic/public';
 	import Discord from '$lib/components/icons/discord.svelte';
 	import Github from '$lib/components/icons/github.svelte';
 	import Google from '$lib/components/icons/google.svelte';
@@ -10,50 +11,15 @@
 	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
 	import MailIcon from '@lucide/svelte/icons/mail';
 	import SettingIcon from '@lucide/svelte/icons/settings';
-	import { toast } from 'svelte-sonner';
-	import { superForm } from 'sveltekit-superforms';
-	import { valibotClient } from 'sveltekit-superforms/adapters';
 	import EnabledSwitch from '../(components)/enabled-switch.svelte';
 	import EmailSettings from './(components)/email-settings.svelte';
 	import OauthProviderSettings from './(components)/oauth-provider-settings.svelte';
 	import ProxyUrlDialog from './(components)/proxy_url_dialog.svelte';
-	import { updateAuthProviderSchema, type UpdateAuthProviderType, updateProxyURLSchema } from './schema';
+	import { type UpdateAuthProviderType } from './schema';
 
 	let { data } = $props();
 	let emailSettingsOpen = $state(false);
 	let proxyUrlDialogOpen = $state(false);
-	let currentOpenedIndex = $state(-1);
-
-	const updateAuthProviderForm = superForm(data.updateAuthProviderForm, {
-		validators: valibotClient(updateAuthProviderSchema),
-		onResult({ result }) {
-			if (result.type === 'success') {
-				toast.success(m.auth_provider_settings_updated());
-				emailSettingsOpen = false;
-				if (currentOpenedIndex !== -1) {
-					authProviders[currentOpenedIndex].open = false;
-				}
-			}
-		},
-		onError({ result }) {
-			toast.error(m.auth_provider_settings_update_failed() + `: ${result.error.message}`);
-		},
-		delayMs: 100
-	});
-
-	const updateProxyURLForm = superForm(data.updateProxyURLForm, {
-		validators: valibotClient(updateProxyURLSchema),
-		onResult({ result }) {
-			if (result.type === 'success') {
-				toast.success(m.proxy_url_updated());
-				proxyUrlDialogOpen = false;
-			}
-		},
-		onError({ result }) {
-			toast.error(m.auth_provider_settings_update_failed() + `: ${result.error.message}`);
-		},
-		delayMs: 100
-	});
 
 	const authProviders: {
 		id: Exclude<UpdateAuthProviderType, 'email'>;
@@ -89,14 +55,13 @@
 				<p>Email</p>
 				<EnabledSwitch enabled={data.settings.auth?.email?.enabled ?? false} class="mr-2 ml-auto" />
 				<ChevronRightIcon class="text-muted-foreground size-4" />
-				<EmailSettings bind:open={emailSettingsOpen} form={updateAuthProviderForm} />
+				<EmailSettings projectId={data.project.id} bind:open={emailSettingsOpen} />
 			</Button>
-			{#each authProviders as provider, i (provider.id)}
+			{#each authProviders as provider (provider.id)}
 				<Button
 					variant="ghost"
 					onclick={() => {
 						provider.open = true;
-						currentOpenedIndex = i;
 					}}
 					class="hover:bg-accent hover:text-accent-foreground flex w-full cursor-pointer items-center gap-2 rounded-lg p-3"
 				>
@@ -109,17 +74,18 @@
 					<ChevronRightIcon class="text-muted-foreground size-4" />
 					<OauthProviderSettings
 						bind:open={provider.open}
-						form={updateAuthProviderForm}
 						type={provider.id}
 						name={provider.name}
 						icon={provider.icon}
-						projectURL={data.settings.proxyURL ?? data.projectURL}
+						projectId={data.project.id}
+						projectURL={data.settings.proxyURL ?? env.PUBLIC_EXTERNAL_URL}
+						auth={data.settings.auth && data.settings.auth[provider.id]}
 					/>
 				</Button>
 			{/each}
 		</Card.Content>
 	</Card.Root>
 	<SettingsZone title="Advanced Settings" icon={SettingIcon}>
-		<ProxyUrlDialog form={updateProxyURLForm} bind:open={proxyUrlDialogOpen} />
+		<ProxyUrlDialog bind:open={proxyUrlDialogOpen} projectId={data.project.id} proxyURL={data.settings.proxyURL} />
 	</SettingsZone>
 </div>
