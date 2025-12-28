@@ -6,13 +6,8 @@ import { projectListSchema } from './schemas';
 
 export const load: PageServerLoad = async (event) => {
 	const apiUrl = new URL('/v1/project/users', env.BAAS_API_URL);
-	console.debug('Cookies:', event.request.headers.get('cookie'));
 	const res = await event.fetch(apiUrl, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			Cookie: event.request.headers.get('cookie') || ''
-		}
+		method: 'GET'
 	});
 
 	if (!res.ok) {
