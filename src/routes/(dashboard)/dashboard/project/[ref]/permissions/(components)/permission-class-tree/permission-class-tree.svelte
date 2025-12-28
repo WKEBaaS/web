@@ -29,7 +29,9 @@
 
 	$effect(() => {
 		if (!fetched && open && children.length === 0) {
-			fetch(`/api/get-users-class-children?ref=${ref}&pcid=${nodeClass.id}`)
+			const uri = `/api/get-users-class-children?ref=${ref}&pcid=${nodeClass.id}`;
+			console.log('Fetching class children from', uri);
+			fetch(uri)
 				.then((resp) => (resp.ok ? resp : Promise.reject(new Error('Failed to fetch class children'))))
 				.then((resp) => resp.json())
 				.then((data) => {
