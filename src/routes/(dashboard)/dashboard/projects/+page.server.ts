@@ -4,12 +4,14 @@ import * as v from 'valibot';
 import type { PageServerLoad } from './$types';
 import { projectListSchema } from './schemas';
 
-export const load: PageServerLoad = async ({ fetch }) => {
+export const load: PageServerLoad = async (event) => {
 	const apiUrl = new URL('/v1/project/users', env.BAAS_API_URL);
-	const res = await fetch(apiUrl, {
+	console.debug('Cookies:', event.request.headers.get('cookie'));
+	const res = await event.fetch(apiUrl, {
 		method: 'GET',
 		headers: {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
+			Cookie: event.request.headers.get('cookie') || ''
 		}
 	});
 
