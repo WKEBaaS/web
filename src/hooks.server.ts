@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
 import { authClient } from '$lib/auth-client';
 import { paraglideMiddleware } from '$lib/paraglide/server';
-import type { Handle } from '@sveltejs/kit';
+import type { Handle, HandleFetch } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
 const handleParaglide: Handle = ({ event, resolve }) =>
@@ -26,16 +26,15 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-const handleFetch: Handle = async ({ event, resolve }) => {
-	console.log('Fetch URL:', event.request.url);
-	if (event.request.url.includes(env.BAAS_API_URL)) {
-		// 將原始請求的所有 Cookie 轉發給內部的 API
+export const handleFetch: HandleFetch = async ({ event, request, fetch }) => {
+	if (request.url.includes(env.BAAS_API_URL)) {
+		// proxy cookies for baas requests
 		const cookie = event.request.headers.get('cookie');
 		if (cookie) {
-			event.request.headers.set('cookie', cookie);
+			request.headers.set('cookie', cookie);
 		}
 	}
-	return resolve(event);
+	return fetch(request);
 };
 
-export const handle: Handle = sequence(handleParaglide, handleAuth, handleFetch);
+export const handle: Handle = sequence(handleParaglide, handleAuth);
