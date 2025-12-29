@@ -10,6 +10,11 @@
 	let { children } = $props();
 </script>
 
+<svelte:head>
+	<title>WKE BaaS</title>
+	<meta name="description" content="WKE BaaS (Backend as a Service)" />
+</svelte:head>
+
 <ModeWatcher />
 <Toaster />
 <Sidebar.Provider>
