@@ -17,9 +17,6 @@ importers:
       '@inlang/paraglide-js':
         specifier: ^2.7.1
         version: 2.7.1
-      embla-carousel-auto-scroll:
-        specifier: ^8.6.0
-        version: 8.6.0(embla-carousel@8.6.0)
     devDependencies:
       '@better-auth/sso':
         specifier: ^1.4.9
@@ -78,6 +75,9 @@ importers:
       dayjs:
         specifier: ^1.11.19
         version: 1.11.19
+      embla-carousel-auto-scroll:
+        specifier: ^8.6.0
+        version: 8.6.0(embla-carousel@8.6.0)
       embla-carousel-svelte:
         specifier: ^8.6.0
         version: 8.6.0(svelte@5.46.1)
