@@ -5,9 +5,9 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as m from '$lib/paraglide/messages';
 	import { updateProjectInfo } from '$lib/remotes'; // Remote function
+	import type { ProjectDetail } from '$lib/schemas';
 	import LoaderCircleIcon from '@lucide/svelte/icons/loader-circle';
 	import { toast } from 'svelte-sonner';
-	import type { ProjectDetail } from '../../schemas';
 
 	interface SettingDialogProps {
 		open?: boolean;

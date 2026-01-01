@@ -1,6 +1,6 @@
 import { command, getRequestEvent, query } from '$app/server';
 import { env } from '$env/dynamic/private';
-import { createClassFuncMetaSchema, createClassFuncSchema } from '$lib/schemas';
+import { createClassFuncMetaSchema, createClassFuncSchema, deleteCreateClassFuncSchema } from '$lib/schemas';
 import * as api from '$lib/server';
 import { error } from '@sveltejs/kit';
 import * as v from 'valibot';
@@ -19,6 +19,27 @@ export const createClassFunc = command(createClassFuncSchema, async (data) => {
 	if (!resp.ok) {
 		console.error('Failed to create class function:', resp.status, resp.statusText);
 		error(resp.status, 'Failed to create class function');
+	}
+
+	return {
+		success: true
+	};
+});
+
+export const deleteCreateClassFunc = command(deleteCreateClassFuncSchema, async (data) => {
+	const event = getRequestEvent();
+	const url = new URL('/v1/project/create-classes-function', env.BAAS_API_URL);
+	const resp = await event.fetch(url, {
+		method: 'DELETE',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(data)
+	});
+
+	if (!resp.ok) {
+		console.error('Failed to delete class function:', resp.status, resp.statusText);
+		error(resp.status, 'Failed to delete class function');
 	}
 
 	return {

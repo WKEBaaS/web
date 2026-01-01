@@ -1,6 +1,6 @@
 {
 	"name": "@wke-baas/web",
-	"version": "0.1.22",
+	"version": "0.1.23",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",

@@ -2,8 +2,8 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as m from '$lib/paraglide/messages';
+	import type { ProjectDetail } from '$lib/schemas';
 	import AlertTriangleIcon from '@lucide/svelte/icons/alert-triangle';
-	import type { ProjectDetail } from '../../schemas';
 	import DeleteProjectDialog from './delete-project-dialog.svelte';
 
 	let { project }: { project: ProjectDetail } = $props();

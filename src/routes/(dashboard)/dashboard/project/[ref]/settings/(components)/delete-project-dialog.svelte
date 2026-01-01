@@ -5,8 +5,8 @@
 	import { Input } from '$lib/components/ui/input';
 	import * as m from '$lib/paraglide/messages';
 	import { deleteProject } from '$lib/remotes/project.remote';
+	import type { ProjectDetail } from '$lib/schemas';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
-	import type { ProjectDetail } from '../../schemas';
 
 	interface Props {
 		project: ProjectDetail;

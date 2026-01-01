@@ -1,8 +1,8 @@
 import { env } from '$env/dynamic/private';
+import { projectDetailSchema, projectSettings } from '$lib/schemas';
 import { error } from '@sveltejs/kit';
 import * as v from 'valibot';
 import type { LayoutServerLoad } from './$types';
-import { projectDetailSchema, projectSettings } from './schemas';
 
 export const load: LayoutServerLoad = async (event) => {
 	if (!event.locals.session) {
@@ -48,7 +48,7 @@ export const load: LayoutServerLoad = async (event) => {
 	const projectSettingsData = await projectSettingsRes.json();
 	const settings = await v.safeParseAsync(projectSettings, projectSettingsData);
 	if (!settings.success) {
-		console.error('Project settings validation failed:', settings.issues);
+		console.error('Project settings validation failed:', JSON.stringify(settings.issues, null, 2));
 		error(500, 'Project settings validation failed.');
 	}
 

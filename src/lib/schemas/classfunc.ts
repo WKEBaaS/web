@@ -59,6 +59,12 @@ export const createClassFuncSchema = v.object({
 	node: nodeSchema
 });
 
+export const deleteCreateClassFuncSchema = v.object({
+	project_id: v.string(),
+	project_ref: v.string(),
+	name: v.string()
+});
+
 export const createClassFuncMetaSchema = v.object({
 	id: v.string(),
 	name: v.string(),
@@ -75,3 +81,4 @@ export type CreateClassFuncFieldKey = keyof NodeFields;
 export type CreateClassFuncNode = v.InferInput<typeof nodeSchema>;
 export type CreateClassFuncInput = v.InferInput<typeof createClassFuncSchema>;
 export type CreateClassFuncMeta = v.InferInput<typeof createClassFuncMetaSchema>;
+export type DeleteCreateClassFuncInput = v.InferInput<typeof deleteCreateClassFuncSchema>;

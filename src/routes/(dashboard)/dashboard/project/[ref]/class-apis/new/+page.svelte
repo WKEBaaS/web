@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
 	import { PermissionSelector } from '$lib/components/permission-selector/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
@@ -14,7 +15,12 @@
 	import { ClassFuncNodeEditor } from '../(components)/classfunc-node-editor/index.js';
 
 	let { data } = $props();
-	let createClassFuncInput = new CreateClassFuncStore();
+	let createClassFuncInput = $derived(
+		new CreateClassFuncStore({
+			project_id: data.project.id,
+			project_ref: data.project.reference
+		})
+	);
 </script>
 
 <div class="flex w-full flex-col p-3 pb-96 font-mono">
@@ -27,6 +33,7 @@
 					const res = await createClassFunc(createClassFuncInput.value());
 					if (res.success) {
 						toast.success('Class Function API created successfully!');
+						invalidateAll();
 					}
 				}}>Create</Button
 			>

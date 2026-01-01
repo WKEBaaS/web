@@ -28,14 +28,14 @@ const INITIAL_NODE: CreateClassFuncInput = {
 export class CreateClassFuncStore {
 	in = $state(INITIAL_NODE);
 
-	constructor(init: CreateClassFuncInput | null = null) {
+	constructor(init: Partial<CreateClassFuncInput> | null = null) {
 		if (!init) return;
 
-		this.in = { ...init };
+		this.in = { ...this.in, ...init };
 	}
 
-	set(input: CreateClassFuncInput) {
-		this.in = { ...input };
+	set(input: Partial<CreateClassFuncInput>) {
+		this.in = { ...this.in, ...input };
 	}
 
 	value() {
