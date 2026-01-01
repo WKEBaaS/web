@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { page } from '$app/state';
 	import { DeleteCreateClassFunc } from '$lib/components/delete-create-class-func';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
@@ -31,7 +30,7 @@
 		<Sidebar.Group>
 			<Button
 				href={resolve(`/(dashboard)/dashboard/project/[ref]/class-apis/new`, {
-					ref: page.params.ref!
+					ref: project.reference
 				})}
 				variant="outline">New Function (API)</Button
 			>
@@ -47,7 +46,7 @@
 									{#snippet child({ props })}
 										<a
 											href={resolve(`/(dashboard)/dashboard/project/[ref]/class-apis/[name]/[version]`, {
-												ref: page.params.ref!,
+												ref: project.reference,
 												name: func.name,
 												version: func.version.toString()
 											})}
@@ -77,6 +76,11 @@
 	bind:open={deleteFuncDialogOpen}
 	bind:name={toDeleteFuncName}
 	onDelete={() => {
+		goto(
+			resolve(`/(dashboard)/dashboard/project/[ref]/class-apis`, {
+				ref: project.reference
+			})
+		);
 		invalidateAll();
 	}}
 />
