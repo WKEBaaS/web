@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { env } from '$env/dynamic/public';
+	import ExternalLink from '$lib/components/external-link/external-link.svelte';
 	import * as Alert from '$lib/components/ui/alert/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Button } from '$lib/components/ui/form/index.js';
@@ -13,8 +14,6 @@
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import ClockIcon from '@lucide/svelte/icons/clock';
 	import DatabaseIcon from '@lucide/svelte/icons/database';
-	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
-	import FileTextIcon from '@lucide/svelte/icons/file-text';
 	import TerminalIcon from '@lucide/svelte/icons/terminal';
 	import dayjs from 'dayjs';
 	import { onMount } from 'svelte';
@@ -60,29 +59,6 @@
 		};
 	});
 </script>
-
-{#snippet APIDocs(props: { url: string; title?: string; description?: string })}
-	<!-- API Docs Link -->
-	<div class="bg-accent border-border flex items-center justify-between rounded-lg border p-4">
-		<div class="flex items-center gap-3">
-			<FileTextIcon class="text-primary h-5 w-5" />
-			<div>
-				<h4 class="text-accent-foreground font-medium">{props.title}</h4>
-				<p class="text-muted-foreground text-sm">{props.description}</p>
-			</div>
-		</div>
-		<Button
-			target="_blank"
-			href={props.url}
-			variant="outline"
-			size="sm"
-			class="border-border text-foreground hover:bg-muted"
-		>
-			<ExternalLinkIcon class="mr-2 h-4 w-4" />
-			Open Docs
-		</Button>
-	</div>
-{/snippet}
 
 <div class="container mx-auto flex flex-col space-y-2 p-5">
 	{#if !isNew && passwordExpired}
@@ -152,16 +128,16 @@
 				</div>
 
 				<Separator />
-				{@render APIDocs({
-					url: new URL('/api/auth/docs', projectURL).toString(),
-					title: 'Auth API Documentation',
-					description: 'Access authentication API documentation'
-				})}
-				{@render APIDocs({
-					url: new URL('/api/rest/docs/', projectURL).toString(),
-					title: 'RESTful API Documentation',
-					description: 'Access RESTful API documentation'
-				})}
+				<ExternalLink
+					url={new URL('/api/auth/docs', projectURL).toString()}
+					title="Auth API Documentation"
+					description="Access authentication API documentation"
+				/>
+				<ExternalLink
+					url={new URL('/api/rest/docs/', projectURL).toString()}
+					title="RESTful API Documentation"
+					description="Access RESTful API documentation"
+				/>
 			</Card.Content>
 		</Card.Root>
 	{/if}

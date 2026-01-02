@@ -1,4 +1,5 @@
-import { env } from '$env/dynamic/private';
+import { env as privateEnv } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
 import { projectDetailSchema, projectSettings } from '$lib/schemas';
 import { error } from '@sveltejs/kit';
 import * as v from 'valibot';
@@ -9,7 +10,7 @@ export const load: LayoutServerLoad = async (event) => {
 		error(401, { message: 'Unauthorized' });
 	}
 
-	const projectURL = new URL('/v1/project/by-ref', env.BAAS_API_URL);
+	const projectURL = new URL('/v1/project/by-ref', privateEnv.BAAS_API_URL);
 	projectURL.searchParams.append('ref', event.params.ref);
 	const projectRes = await event.fetch(projectURL, {
 		method: 'GET',
@@ -32,7 +33,7 @@ export const load: LayoutServerLoad = async (event) => {
 		error(500, 'Project validation failed.');
 	}
 
-	const projectSettingsURL = new URL('/v1/project/settings/by-ref', env.BAAS_API_URL);
+	const projectSettingsURL = new URL('/v1/project/settings/by-ref', privateEnv.BAAS_API_URL);
 	projectSettingsURL.searchParams.append('ref', event.params.ref);
 	const projectSettingsRes = await event.fetch(projectSettingsURL, {
 		method: 'GET',
@@ -52,8 +53,12 @@ export const load: LayoutServerLoad = async (event) => {
 		error(500, 'Project settings validation failed.');
 	}
 
+	const externalURL = new URL(publicEnv.PUBLIC_EXTERNAL_URL);
+	const projectExternalURL = `https://${project.output.reference}.${externalURL.host}`;
+
 	return {
 		project: project.output,
-		settings: settings.output
+		settings: settings.output,
+		projectURL: projectExternalURL
 	};
 };

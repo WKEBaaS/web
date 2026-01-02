@@ -13,7 +13,7 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { createClassFunc } from '$lib/remotes/index.js';
 	import { CreateClassFuncStore } from '$lib/stores/index.js';
-	import { FolderOpenIcon, PencilIcon, SaveIcon, XIcon } from '@lucide/svelte';
+	import { ExternalLinkIcon, FolderOpenIcon, PencilIcon, SaveIcon, XIcon } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 	import { ClassFuncNodeEditor } from '../../(components)/classfunc-node-editor/index.js';
 
@@ -24,6 +24,7 @@
 	let editing = $state(false);
 
 	const pendingFunc = $derived(new CreateClassFuncStore(data.func));
+	const docsLink = $derived(new URL(`/api/rest/docs/#tag/rpc-${data.func.name.toLowerCase()}`, data.projectURL));
 
 	function handleEdit() {
 		// Create a restore point before editing starts
@@ -54,7 +55,19 @@
 	<Field.Group>
 		<div class="bg-background/95 sticky top-0 z-10 mb-4 flex items-center justify-between border-b py-2 backdrop-blur">
 			<div class="flex flex-col">
-				<Field.Legend>Class Function API</Field.Legend>
+				<Field.Legend>
+					<span class="mr-auto"> Class Function API </span>
+					<Button
+						target="_blank"
+						href={docsLink.toString()}
+						variant="outline"
+						size="sm"
+						class="border-border text-foreground hover:bg-muted"
+					>
+						<ExternalLinkIcon class="mr-2 size-3" />
+						Open Docs
+					</Button>
+				</Field.Legend>
 				<div class="flex items-center gap-2 text-xs">
 					<span class="text-muted-foreground">ID: {data.func.name}</span>
 					<span class="text-muted-foreground">/</span>
