@@ -1,26 +1,15 @@
 <script lang="ts">
-	import { authClient } from '$lib/auth-client';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { UseClipboard } from '$lib/hooks/use-clipboard.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import dayjs from 'dayjs';
 	import type { PageData } from './$types';
-	const clipboard = new UseClipboard();
 
 	let { data }: { data: PageData } = $props();
 </script>
 
 <section class="px-2 pt-2">
 	<Button variant="outline" href="/dashboard/new">{m.new_project()}</Button>
-	<Button
-		onclick={async () => {
-			const { data } = await authClient.token();
-			clipboard.copy(data?.token || '');
-		}}
-	>
-		Copy JWT (Debug)
-	</Button>
 </section>
 <section class="inline-flex flex-wrap gap-2 p-2">
 	{#each data.projects || [] as project (project.reference)}
