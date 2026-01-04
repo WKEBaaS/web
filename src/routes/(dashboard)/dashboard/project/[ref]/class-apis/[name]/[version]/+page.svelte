@@ -150,20 +150,16 @@
 				<Field.Description>Root class means all classes created by the API will under this class.</Field.Description>
 
 				<Field.Field>
+					<div class="bg-muted/40 text-muted-foreground flex items-center gap-2 rounded border p-3 font-mono text-sm">
+						<FolderOpenIcon class="h-4 w-4" />
+						<span>Root Class ID: {pendingFunc.root_class_id || 'Not Selected'}</span>
+					</div>
 					{#if editing}
 						<UserClassTree
 							nodeClass={data.root}
 							ref={data.project.reference}
-							onSelect={(c) => {
-								console.log('Selected class:', c.id, c.chinese_name);
-								pendingFunc.root_class_id = c.id;
-							}}
+							bind:selectedID={pendingFunc.root_class_id}
 						/>
-					{:else}
-						<div class="bg-muted/40 text-muted-foreground flex items-center gap-2 rounded border p-3 font-mono text-sm">
-							<FolderOpenIcon class="h-4 w-4" />
-							<span>Root Class ID: {pendingFunc.root_class_id || 'Not Selected'}</span>
-						</div>
 					{/if}
 
 					{#if pendingFunc.root_class_id !== ''}

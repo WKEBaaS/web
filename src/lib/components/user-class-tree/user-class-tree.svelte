@@ -43,6 +43,12 @@
 		}
 	});
 
+	$effect(() => {
+		if (selectedID === nodeClass.id) {
+			selectedName = nodeClass.chinese_name;
+		}
+	});
+
 	function toggle(e: MouseEvent) {
 		e.preventDefault();
 		e.stopPropagation();

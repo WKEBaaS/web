@@ -64,12 +64,14 @@
 				<Field.Legend>API Root Class</Field.Legend>
 				<Field.Description>Root class means all classes created by the API will under this class.</Field.Description>
 				<Field.Field>
+					<div class="bg-muted/40 text-muted-foreground flex items-center gap-2 rounded border p-3 font-mono text-sm">
+						<FolderOpenIcon class="h-4 w-4" />
+						<span>Root Class ID: {createClassFuncInput.root_class_id || 'Not Selected'}</span>
+					</div>
 					<UserClassTree
 						nodeClass={data.root}
 						ref={data.project.reference}
-						onSelect={(c) => {
-							createClassFuncInput.root_class_id = c.id;
-						}}
+						bind:selectedID={createClassFuncInput.root_class_id}
 					/>
 					{#if createClassFuncInput.root_class_id !== ''}
 						<Card.Root>
