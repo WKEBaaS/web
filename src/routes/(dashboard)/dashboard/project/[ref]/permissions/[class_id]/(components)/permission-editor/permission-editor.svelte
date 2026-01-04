@@ -1,16 +1,23 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { Checkbox } from '$lib/components/ui/checkbox';
-	import { Input } from '$lib/components/ui/input';
+	import * as Command from '$lib/components/ui/command/index.js';
 	import { Label } from '$lib/components/ui/label';
+	import * as Popover from '$lib/components/ui/popover/index.js';
 	import * as Select from '$lib/components/ui/select';
-	import type { Permission } from '$lib/schemas';
-	import { Trash2, User, Users } from '@lucide/svelte/icons';
+	import type { Permission, ProjectDetail, Role } from '$lib/schemas';
+	import { cn } from '$lib/utils';
+	import { Check, ChevronsUpDown, Trash2, User, Users } from '@lucide/svelte/icons';
+	import { Debounced } from 'runed';
+	import { tick } from 'svelte';
+	import { toast } from 'svelte-sonner';
 	import { PERMISSION_DEFINITIONS } from '.';
 
 	interface PermissionEditorProps {
+		project: ProjectDetail;
 		permission: Permission;
 		editing: boolean;
 		onRemove?: () => void;
@@ -32,10 +39,45 @@
 	}
 
 	let {
+		project,
 		editing = $bindable(false),
 		permission = $bindable(initPermission),
 		onRemove = () => {}
 	}: PermissionEditorProps = $props();
+
+	// --- Combobox Logic Start ---
+	let open = $state(false);
+	let triggerRef = $state<HTMLButtonElement>(null!);
+	let searchValue = $state(''); // 綁定到 Command.Input
+
+	function closeAndFocusTrigger() {
+		open = false;
+		tick().then(() => {
+			triggerRef?.focus();
+		});
+	}
+
+	const debouncedSearch = new Debounced(() => searchValue, 500);
+	let roles: Role[] = $state([]);
+
+	// 當搜尋文字改變或類型改變時，觸發搜尋
+	$effect(() => {
+		if (open && debouncedSearch.current + permission.role_type) {
+			const url =
+				resolve(`/api/project/[ref]/db-roles`, {
+					ref: project.reference
+				}) + `?role_type=${permission.role_type}&query=${debouncedSearch.current}`;
+			fetch(url)
+				.then((res) => res.json())
+				.then((data) => {
+					roles = data;
+				})
+				.catch((err) => {
+					console.error('Error fetching roles:', err);
+					toast.error('無法取得角色列表，請稍後再試。');
+				});
+		}
+	});
 </script>
 
 <Card.Root class="p-1">
@@ -45,7 +87,15 @@
 				<div class="space-y-4">
 					<div class="space-y-2">
 						<Label>類型</Label>
-						<Select.Root type="single" bind:value={permission.role_type}>
+						<Select.Root
+							type="single"
+							bind:value={permission.role_type}
+							onValueChange={() => {
+								// 當類型改變時，清空當前選擇並重新搜尋
+								permission.role_id = '';
+								searchValue = '';
+							}}
+						>
 							<Select.Trigger>
 								{permission.role_type}
 							</Select.Trigger>
@@ -56,9 +106,63 @@
 						</Select.Root>
 					</div>
 
-					<div class="space-y-2">
-						<Label>角色 ID (UUID)</Label>
-						<Input type="text" bind:value={permission.role_id} placeholder="UUID" class="font-mono text-xs" />
+					<div class="flex flex-col space-y-2">
+						<Label>角色 ID (UUID) / 搜尋</Label>
+
+						<Popover.Root bind:open>
+							<Popover.Trigger bind:ref={triggerRef}>
+								{#snippet child({ props })}
+									<Button
+										variant="outline"
+										class="w-full justify-between font-mono text-xs"
+										{...props}
+										role="combobox"
+										aria-expanded={open}
+									>
+										{#if permission.role_id}
+											<span class="truncate">
+												{permission.role_name ?? permission.role_id}
+											</span>
+										{:else}
+											<span class="text-muted-foreground">選擇或輸入 ID...</span>
+										{/if}
+										<ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+									</Button>
+								{/snippet}
+							</Popover.Trigger>
+							<Popover.Content class="w-55 p-0">
+								<Command.Root shouldFilter={false}>
+									<Command.Input placeholder="搜尋名稱或 UUID..." bind:value={searchValue} />
+									<Command.List>
+										{#if debouncedSearch.pending}
+											<Command.Loading>搜尋中...</Command.Loading>
+										{:else if roles.length === 0}
+											<Command.Empty>找不到符合的結果</Command.Empty>
+										{/if}
+
+										<Command.Group heading="搜尋結果">
+											{#each roles as role (role.id)}
+												<Command.Item
+													value={role.id}
+													onSelect={() => {
+														permission.role_id = role.id;
+														permission.role_name = role.name;
+														// 可以在這裡設定 permission.role_name 如果你的 schema 有這個欄位
+														closeAndFocusTrigger();
+													}}
+												>
+													<Check class={cn('mr-2 h-4 w-4', permission.role_id !== role.id && 'text-transparent')} />
+													<div class="flex flex-col">
+														<span>{role.name}</span>
+														<span class="text-muted-foreground font-mono text-[10px]">{role.email}</span>
+													</div>
+												</Command.Item>
+											{/each}
+										</Command.Group>
+									</Command.List>
+								</Command.Root>
+							</Popover.Content>
+						</Popover.Root>
 					</div>
 
 					<div class="pt-2">

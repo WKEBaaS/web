@@ -56,7 +56,14 @@ export const permissionSchema = v.object({
 	role_name: v.optional(v.string())
 });
 
+export const roleSchema = v.object({
+	id: v.pipe(v.string(), v.uuid()),
+	name: v.string(),
+	email: v.optional(v.string())
+});
+
 // Type inference
 export type Class = v.InferInput<typeof classSchema>;
 export type ClassMetadata = v.InferInput<typeof classMetadataSchema>;
 export type Permission = v.InferInput<typeof permissionSchema>;
+export type Role = v.InferInput<typeof roleSchema>;

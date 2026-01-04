@@ -4,7 +4,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import { Separator } from '$lib/components/ui/separator';
 	import { updateUsersClassPermissions } from '$lib/remotes/users-class.remote.js';
-	import type { Permission } from '$lib/schemas/usersdb.js';
+	import type { Permission } from '$lib/schemas';
 	import { Plus, Save, Shield } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 	import { PermissionEditor } from './(components)/permission-editor/index.js';
@@ -111,7 +111,12 @@
 			<div class="space-y-3">
 				<!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
 				{#each permissions as _, i (i)}
-					<PermissionEditor bind:permission={permissions[i]} bind:editing onRemove={() => removePermission(i)} />
+					<PermissionEditor
+						project={data.project}
+						bind:permission={permissions[i]}
+						bind:editing
+						onRemove={() => removePermission(i)}
+					/>
 				{/each}
 			</div>
 		{/if}

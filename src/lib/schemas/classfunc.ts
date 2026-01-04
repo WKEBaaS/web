@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { type Permission, permissionSchema } from './usersdb';
+import { type Permission, permissionSchema } from './project-db';
 
 const emptyStringToNull = v.pipe(
 	v.string(),
