@@ -83,7 +83,7 @@
 
 	<Separator />
 
-	<div class="space-y-4">
+	<div class="space-y-4 pb-150">
 		<div class="flex items-center justify-between">
 			<h2 class="text-xl font-semibold">權限列表</h2>
 			{#if editing}
